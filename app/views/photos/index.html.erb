@@ -1,0 +1,39 @@
+<% content_for :title, "Galeria" %>
+
+<section class="upload-card">
+  <h1>Galeria na nuvem</h1>
+  <p class="sub">Envie uma imagem; em produção ela é armazenada no Amazon S3.</p>
+
+  <%= form_with model: @photo, url: photos_path, class: "upload-form" do |f| %>
+    <% if @photo.errors.any? %>
+      <div class="form-error"><%= @photo.errors.full_messages.to_sentence %></div>
+    <% end %>
+    <div class="row">
+      <%= f.text_field :title, placeholder: "Título da foto", required: true %>
+      <%= f.text_field :caption, placeholder: "Legenda (opcional)" %>
+    </div>
+    <label class="file-drop">
+      <%= f.file_field :image, accept: "image/png,image/jpeg,image/webp,image/gif", direct_upload: true %>
+      <span>Escolher imagem</span>
+    </label>
+    <%= f.submit "Enviar para a galeria", class: "btn" %>
+  <% end %>
+</section>
+
+<% if @photos.any? %>
+  <div class="gallery">
+    <% @photos.each do |photo| %>
+      <figure class="tile">
+        <%= image_tag photo.image, alt: photo.title, loading: "lazy" %>
+        <figcaption>
+          <strong><%= photo.title %></strong>
+          <% if photo.caption.present? %><span><%= photo.caption %></span><% end %>
+          <%= button_to "Remover", photo_path(photo), method: :delete, class: "remove",
+                form: { data: { turbo_confirm: "Remover esta foto?" } } %>
+        </figcaption>
+      </figure>
+    <% end %>
+  </div>
+<% else %>
+  <div class="empty">Nenhuma foto ainda. Envie a primeira acima.</div>
+<% end %>
